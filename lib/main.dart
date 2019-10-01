@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
 
+const double smallIconSize = 24.0;
+const double largeIconSize = 196.0;
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -25,8 +28,10 @@ class _TimeMachineState extends State<TimeMachine>
   AnimationController _rotationAnimation;
   AnimationController _scaleAnimation;
   AnimationController _galaxyAnimation;
+  AnimationController _slideAnimation;
 
   Animation<double> _scaleCurve;
+  Animation<Offset> _slideCurve;
 
   @override
   void initState() {
@@ -52,14 +57,43 @@ class _TimeMachineState extends State<TimeMachine>
         }
       });
 
-    _scaleCurve =
-        CurvedAnimation(parent: _scaleAnimation, curve: Curves.easeIn);
+    _scaleCurve = CurvedAnimation(
+      parent: _scaleAnimation,
+      curve: Curves.easeIn,
+    );
 
     _scaleAnimation.forward();
+
+    _slideAnimation = AnimationController(
+      duration: const Duration(milliseconds: 3600),
+      vsync: this,
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _slideAnimation.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _slideAnimation.forward();
+        }
+      });
   }
 
   @override
   Widget build(BuildContext context) {
+    double deviceHeight = MediaQuery.of(context).size.height;
+    double deviceWidth = MediaQuery.of(context).size.width;
+
+    _slideCurve = Tween<Offset>(
+      begin: Offset(-2, 2),
+      end: Offset(
+          deviceWidth / smallIconSize, -1 * deviceHeight / smallIconSize),
+    ).animate(_slideAnimation);
+
+    Animation<Offset> _reverseSlide = Tween<Offset>(
+      begin: Offset(deviceWidth / smallIconSize, 2),
+      end: Offset(-2, -1 * deviceHeight / smallIconSize),
+    ).animate(_slideAnimation);
+
+    _slideAnimation.forward();
+
     return Scaffold(
       body: Container(
         color: Colors.black,
@@ -81,12 +115,40 @@ class _TimeMachineState extends State<TimeMachine>
                     turns: _rotationAnimation,
                     child: Icon(
                       Icons.hourglass_empty,
-                      size: 192,
+                      size: largeIconSize,
                       color: Colors.white,
                     ),
                   ),
                 ),
               ),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: SlideTransition(
+                  position: _slideCurve,
+                  child: RotationTransition(
+                    turns: _rotationAnimation,
+                    child: Icon(
+                      Icons.home,
+                      color: Colors.white,
+                      size: smallIconSize,
+                    ),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: SlideTransition(
+                  position: _reverseSlide,
+                  child: RotationTransition(
+                    turns: _rotationAnimation,
+                    child: Icon(
+                      Icons.star,
+                      color: Colors.white,
+                      size: smallIconSize,
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
         ),
