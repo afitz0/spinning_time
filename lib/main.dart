@@ -9,9 +9,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.grey,
       ),
       home: TimeMachine(),
     );
@@ -25,53 +24,49 @@ class TimeMachine extends StatefulWidget {
 
 class _TimeMachineState extends State<TimeMachine>
     with TickerProviderStateMixin {
-  AnimationController _rotationAnimation;
-  AnimationController _scaleAnimation;
-  AnimationController _galaxyAnimation;
-  AnimationController _slideAnimation;
+  AnimationController _repeatingAnimationShort;
+  AnimationController _repeatingAnimationLong;
+  AnimationController _loopingAnimation;
+  AnimationController _loopingAnimationLong;
 
   Animation<double> _scaleCurve;
   Animation<Offset> _slideCurve;
+  Animation<Offset> _reverseSlide;
+  Animation<double> _scaleCurveSlow;
 
   @override
   void initState() {
     super.initState();
-    _rotationAnimation = AnimationController(
+
+    _repeatingAnimationShort = AnimationController(
       duration: const Duration(milliseconds: 3600),
       vsync: this,
     )..repeat();
 
-    _galaxyAnimation = AnimationController(
+    _repeatingAnimationLong = AnimationController(
       duration: const Duration(milliseconds: 14400),
       vsync: this,
     )..repeat();
 
-    _scaleAnimation = AnimationController(
+    _loopingAnimation = AnimationController(
       duration: const Duration(milliseconds: 3600),
       vsync: this,
     )..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          _scaleAnimation.reverse();
+          _loopingAnimation.reverse();
         } else if (status == AnimationStatus.dismissed) {
-          _scaleAnimation.forward();
+          _loopingAnimation.forward();
         }
       });
 
-    _scaleCurve = CurvedAnimation(
-      parent: _scaleAnimation,
-      curve: Curves.easeIn,
-    );
-
-    _scaleAnimation.forward();
-
-    _slideAnimation = AnimationController(
-      duration: const Duration(milliseconds: 3600),
+    _loopingAnimationLong = AnimationController(
+      duration: const Duration(seconds: 30),
       vsync: this,
     )..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          _slideAnimation.reverse();
+          _loopingAnimationLong.reverse();
         } else if (status == AnimationStatus.dismissed) {
-          _slideAnimation.forward();
+          _loopingAnimationLong.forward();
         }
       });
   }
@@ -81,18 +76,34 @@ class _TimeMachineState extends State<TimeMachine>
     double deviceHeight = MediaQuery.of(context).size.height;
     double deviceWidth = MediaQuery.of(context).size.width;
 
+    _scaleCurve = CurvedAnimation(
+      parent: _loopingAnimation,
+      curve: Curves.easeIn,
+    );
+
+    _scaleCurveSlow = Tween<double>(
+      begin: 0,
+      end: 5,
+    ).animate(_loopingAnimationLong);
+
+    // _scaleCurveSlow = CurvedAnimation(
+    //   parent: _loopingAnimationLong,
+    //   curve: Curves.easeOutCirc,
+    // );
+
     _slideCurve = Tween<Offset>(
       begin: Offset(-2, 2),
       end: Offset(
           deviceWidth / smallIconSize, -1 * deviceHeight / smallIconSize),
-    ).animate(_slideAnimation);
+    ).animate(_loopingAnimation);
 
-    Animation<Offset> _reverseSlide = Tween<Offset>(
+    _reverseSlide = Tween<Offset>(
       begin: Offset(deviceWidth / smallIconSize, 2),
       end: Offset(-2, -1 * deviceHeight / smallIconSize),
-    ).animate(_slideAnimation);
+    ).animate(_loopingAnimation);
 
-    _slideAnimation.forward();
+    _loopingAnimation.forward();
+    _loopingAnimationLong.forward();
 
     return Scaffold(
       body: Container(
@@ -102,53 +113,61 @@ class _TimeMachineState extends State<TimeMachine>
             children: <Widget>[
               Align(
                 alignment: Alignment.center,
-                child: RotationTransition(
-                  turns: _galaxyAnimation,
-                  child: Image.asset('galaxy_transparent.png'),
-                ),
-              ),
-              Align(
-                alignment: Alignment.center,
                 child: ScaleTransition(
-                  scale: _scaleCurve,
+                  scale: _scaleCurveSlow,
                   child: RotationTransition(
-                    turns: _rotationAnimation,
-                    child: Icon(
-                      Icons.hourglass_empty,
-                      size: largeIconSize,
-                      color: Colors.white,
-                    ),
+                    turns: _repeatingAnimationLong,
+                    child: Image.asset('galaxy_transparent.png'),
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: SlideTransition(
-                  position: _slideCurve,
-                  child: RotationTransition(
-                    turns: _rotationAnimation,
-                    child: Icon(
-                      Icons.home,
-                      color: Colors.white,
-                      size: smallIconSize,
-                    ),
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: SlideTransition(
-                  position: _reverseSlide,
-                  child: RotationTransition(
-                    turns: _rotationAnimation,
-                    child: Icon(
-                      Icons.star,
-                      color: Colors.white,
-                      size: smallIconSize,
-                    ),
-                  ),
-                ),
-              )
+
+              /*** Spinning Hourglaas ***/
+              // Align(
+              //   alignment: Alignment.center,
+              //   child: ScaleTransition(
+              //     scale: _scaleCurve,
+              //     child: RotationTransition(
+              //       turns: _repeatingAnimationShort,
+              //       child: Icon(
+              //         Icons.hourglass_empty,
+              //         size: largeIconSize,
+              //         color: Colors.white,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+
+              /*** Flying home ***/
+              // Align(
+              //   alignment: Alignment.bottomLeft,
+              //   child: SlideTransition(
+              //     position: _slideCurve,
+              //     child: RotationTransition(
+              //       turns: _repeatingAnimationShort,
+              //       child: Icon(
+              //         Icons.home,
+              //         color: Colors.white,
+              //         size: smallIconSize,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+
+              /*** Flying Rocket ***/
+              // Align(
+              //   alignment: Alignment.bottomLeft,
+              //   child: SlideTransition(
+              //     position: _reverseSlide,
+              //     child: RotationTransition(
+              //       turns: _repeatingAnimationShort,
+              //       child: Text(
+              //         "🚀",
+              //         style: TextStyle(fontSize: smallIconSize),
+              //       ),
+              //     ),
+              //   ),
+              // )
             ],
           ),
         ),
