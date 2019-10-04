@@ -44,7 +44,7 @@ class _TimeMachineState extends State<TimeMachine>
     )..repeat();
 
     _repeatingAnimationLong = AnimationController(
-      duration: const Duration(milliseconds: 14400),
+      duration: const Duration(seconds: 15),
       vsync: this,
     )..repeat();
 
@@ -105,72 +105,102 @@ class _TimeMachineState extends State<TimeMachine>
     _loopingAnimation.forward();
     _loopingAnimationLong.forward();
 
-    return Scaffold(
-      body: Container(
-        color: Colors.black,
-        child: Center(
-          child: Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.center,
-                child: ScaleTransition(
-                  scale: _scaleCurveSlow,
-                  child: RotationTransition(
-                    turns: _repeatingAnimationLong,
-                    child: Image.asset('galaxy_transparent.png'),
-                  ),
-                ),
+    return Container(
+      color: Colors.black,
+      child: Center(
+        child: Stack(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: TimeStopper(
+                controller: _repeatingAnimationLong,
               ),
-
-              /*** Spinning Hourglaas ***/
-              // Align(
-              //   alignment: Alignment.center,
-              //   child: ScaleTransition(
-              //     scale: _scaleCurve,
-              //     child: RotationTransition(
-              //       turns: _repeatingAnimationShort,
-              //       child: Icon(
-              //         Icons.hourglass_empty,
-              //         size: largeIconSize,
-              //         color: Colors.white,
-              //       ),
-              //     ),
-              //   ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              // child: ScaleTransition(
+              // scale: _scaleCurveSlow,
+              child: RotationTransition(
+                turns: _repeatingAnimationLong,
+                child: Image.asset('galaxy_transparent.png'),
+              ),
               // ),
+            ),
 
-              /*** Flying home ***/
-              // Align(
-              //   alignment: Alignment.bottomLeft,
-              //   child: SlideTransition(
-              //     position: _slideCurve,
-              //     child: RotationTransition(
-              //       turns: _repeatingAnimationShort,
-              //       child: Icon(
-              //         Icons.home,
-              //         color: Colors.white,
-              //         size: smallIconSize,
-              //       ),
-              //     ),
-              //   ),
-              // ),
+            /*** Spinning Hourglaas ***/
+            // Align(
+            //   alignment: Alignment.center,
+            //   child: ScaleTransition(
+            //     scale: _scaleCurve,
+            //     child: RotationTransition(
+            //       turns: _repeatingAnimationShort,
+            //       child: Icon(
+            //         Icons.hourglass_empty,
+            //         size: largeIconSize,
+            //         color: Colors.white,
+            //       ),
+            //     ),
+            //   ),
+            // ),
 
-              /*** Flying Rocket ***/
-              // Align(
-              //   alignment: Alignment.bottomLeft,
-              //   child: SlideTransition(
-              //     position: _reverseSlide,
-              //     child: RotationTransition(
-              //       turns: _repeatingAnimationShort,
-              //       child: Text(
-              //         "🚀",
-              //         style: TextStyle(fontSize: smallIconSize),
-              //       ),
-              //     ),
-              //   ),
-              // )
-            ],
-          ),
+            /*** Flying home ***/
+            // Align(
+            //   alignment: Alignment.bottomLeft,
+            //   child: SlideTransition(
+            //     position: _slideCurve,
+            //     child: RotationTransition(
+            //       turns: _repeatingAnimationShort,
+            //       child: Icon(
+            //         Icons.home,
+            //         color: Colors.white,
+            //         size: smallIconSize,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+
+            /*** Flying Rocket ***/
+            // Align(
+            //   alignment: Alignment.bottomLeft,
+            //   child: SlideTransition(
+            //     position: _reverseSlide,
+            //     child: RotationTransition(
+            //       turns: _repeatingAnimationShort,
+            //       child: Text(
+            //         "🚀",
+            //         style: TextStyle(fontSize: smallIconSize),
+            //       ),
+            //     ),
+            //   ),
+            // )
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class TimeStopper extends StatelessWidget {
+  final AnimationController controller;
+
+  const TimeStopper({Key key, this.controller}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (controller.isAnimating) {
+          controller.stop();
+        } else {
+          controller.repeat();
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+        ),
+        width: 100,
+        height: 100,
       ),
     );
   }
