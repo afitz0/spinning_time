@@ -90,7 +90,7 @@ class _TimeMachineState extends State<TimeMachine>
                 alignment: Alignment.center,
                 child: RotationTransition(
                   turns: _repeatingAnimationLong,
-                  child: Image.asset('galaxy_transparent.png'),
+                  child: GalaxyFitz(),
                 ),
               ),
 
@@ -265,5 +265,12 @@ class TimeSwitcher extends StatelessWidget {
         height: 100,
       ),
     );
+  }
+}
+
+class GalaxyFitz extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset('galaxy_transparent.png');
   }
 }
