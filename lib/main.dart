@@ -173,7 +173,7 @@ class _TimeMachineState extends State<TimeMachine>
           ),
         ),
 
-        /*** Hidden Button -- Reverses time. ***/
+        /*** Hidden Button -- Flings. ***/
         Align(
           alignment: Alignment.bottomRight,
           child: FlingButton(
