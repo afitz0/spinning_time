@@ -176,8 +176,10 @@ class _TimeMachineState extends State<TimeMachine>
         /*** Hidden Button -- Reverses time. ***/
         Align(
           alignment: Alignment.bottomRight,
-          child: TimeSwitcher(
-            controller: _loopingAnimationShort,
+          child: FlingButton(
+            controllers: [
+              _loopingAnimationShort,
+            ],
           ),
         ),
       ],
@@ -213,6 +215,9 @@ class _TimeMachineState extends State<TimeMachine>
   }
 }
 
+/// Hidden button that stops all the given animations, or restart them if not running.
+///
+/// TODO: This does not differentiate between "looping" vs. "repeating" animations.
 class TimeStopper extends StatelessWidget {
   final List<AnimationController> controllers;
 
@@ -223,7 +228,6 @@ class TimeStopper extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         controllers.forEach((controller) {
-          print(controller.status);
           if (controller.isAnimating) {
             controller.stop();
           } else {
@@ -242,20 +246,19 @@ class TimeStopper extends StatelessWidget {
   }
 }
 
-/// Switches an animation controlled by the given controller from forward to
-/// reverse or vice-versa. Starts animating if currently paused and repeats as
-/// appropriate (..repeat() if forward, applicable listeners if revers).
-class TimeSwitcher extends StatelessWidget {
-  final AnimationController controller;
+/// Takes the given controllers, and flings them forward.
+class FlingButton extends StatelessWidget {
+  final List<AnimationController> controllers;
 
-  const TimeSwitcher({Key key, this.controller}) : super(key: key);
+  const FlingButton({Key key, this.controllers}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        controller.fling();
-        // controller.animateTo(1);
+        controllers.forEach((controller) {
+          controller.fling();
+        });
       },
       child: Container(
         decoration: BoxDecoration(
