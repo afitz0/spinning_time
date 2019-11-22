@@ -12,7 +12,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.grey,
       ),
-      home: TimeMachine(),
+      home: Scaffold(
+        body: Container(
+          color: Colors.black,
+          child: Center(
+            child: TimeMachine(),
+          ),
+        ),
+      ),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -80,107 +87,100 @@ class _TimeMachineState extends State<TimeMachine>
   Widget build(BuildContext context) {
     setAnimatables();
 
-    return Scaffold(
-      body: Container(
-        color: Colors.black,
-        child: Center(
-          child: Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.center,
-                child: RotationTransition(
-                  turns: _repeatingAnimationLong,
-                  child: GalaxyFitz(),
-                ),
-              ),
+    return Stack(
+      children: <Widget>[
+        Align(
+          alignment: Alignment.center,
+          child: RotationTransition(
+            turns: _repeatingAnimationLong,
+            child: GalaxyFitz(),
+          ),
+        ),
 
-              /*** Spinning Hourglaas ***/
-              Align(
-                alignment: Alignment.center,
-                child: ScaleTransition(
-                  scale: _loopingAnimationShort.drive(_scaleCurve),
-                  child: RotationTransition(
-                    turns: _repeatingAnimationShort,
-                    child: Icon(
-                      Icons.hourglass_empty,
-                      size: largeIconSize,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+        /*** Spinning Hourglaas ***/
+        Align(
+          alignment: Alignment.center,
+          child: ScaleTransition(
+            scale: _loopingAnimationShort.drive(_scaleCurve),
+            child: RotationTransition(
+              turns: _repeatingAnimationShort,
+              child: Icon(
+                Icons.hourglass_empty,
+                size: largeIconSize,
+                color: Colors.white,
               ),
+            ),
+          ),
+        ),
 
-              /*** Flying home ***/
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: SlideTransition(
-                  position: _loopingAnimationShort.drive(_slideCurve),
-                  child: RotationTransition(
-                    turns: _repeatingAnimationShort,
-                    child: Icon(
-                      Icons.home,
-                      color: Colors.white,
-                      size: smallIconSize,
-                    ),
-                  ),
-                ),
+        /*** Flying home ***/
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: SlideTransition(
+            position: _loopingAnimationShort.drive(_slideCurve),
+            child: RotationTransition(
+              turns: _repeatingAnimationShort,
+              child: Icon(
+                Icons.home,
+                color: Colors.white,
+                size: smallIconSize,
               ),
+            ),
+          ),
+        ),
 
-              /*** Flying Rocket ***/
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: SlideTransition(
-                  position: _loopingAnimationShort.drive(_reverseSlide),
-                  child: RotationTransition(
-                    turns: _repeatingAnimationShort,
-                    child: Text(
-                      "🚀",
-                      style: TextStyle(fontSize: smallIconSize),
-                    ),
-                  ),
-                ),
+        /*** Flying Rocket ***/
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: SlideTransition(
+            position: _loopingAnimationShort.drive(_reverseSlide),
+            child: RotationTransition(
+              turns: _repeatingAnimationShort,
+              child: Text(
+                "🚀",
+                style: TextStyle(fontSize: smallIconSize),
               ),
+            ),
+          ),
+        ),
 
-              /*** Revolving Rocket ***/
-              Align(
-                alignment: Alignment(0.75, 0),
-                child: RotationTransition(
-                  turns: _repeatingAnimationLong,
-                  alignment: Alignment(-10, 0),
-                  child: RotationTransition(
-                    turns: _repeatingAnimationShort,
-                    child: Text(
-                      "🚀",
-                      style: TextStyle(fontSize: smallIconSize),
-                    ),
-                  ),
-                ),
+        /*** Revolving Rocket ***/
+        Align(
+          alignment: Alignment(0.75, 0),
+          child: RotationTransition(
+            turns: _repeatingAnimationLong,
+            alignment: Alignment(-10, 0),
+            child: RotationTransition(
+              turns: _repeatingAnimationShort,
+              child: Text(
+                "🚀",
+                style: TextStyle(fontSize: smallIconSize),
               ),
+            ),
+          ),
+        ),
 
-              /*** Hidden Button -- Stops time. ***/
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: TimeStopper(
-                  controllers: [
-                    _repeatingAnimationLong,
-                    _repeatingAnimationShort,
-                    _loopingAnimationShort,
-                    _loopingAnimationLong,
-                  ],
-                ),
-              ),
-
-              /*** Hidden Button -- Reverses time. ***/
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TimeSwitcher(
-                  controller: _loopingAnimationShort,
-                ),
-              ),
+        /*** Hidden Button -- Stops time. ***/
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: TimeStopper(
+            controllers: [
+              _repeatingAnimationLong,
+              _repeatingAnimationShort,
+              _loopingAnimationShort,
+              _loopingAnimationLong,
             ],
           ),
         ),
-      ),
+
+        /*** Hidden Button -- Reverses time. ***/
+        Align(
+          alignment: Alignment.bottomRight,
+          child: TimeSwitcher(
+            controller: _loopingAnimationShort,
+          ),
+        ),
+      ],
     );
   }
 
@@ -268,6 +268,7 @@ class TimeSwitcher extends StatelessWidget {
   }
 }
 
+/// The galaxy fits, so we'll just put it here...
 class GalaxyFitz extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
